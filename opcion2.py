@@ -1,17 +1,17 @@
-import xlwings as xw
 import requests
 from bs4 import BeautifulSoup
+import openpyxl
 
-# Abrir el archivo de Excel con xlwings
-archivo_excel = r"C:\Users\Windows\Desktop\PYTHON\COMPARAR_PRECIOS.xlsm"
-app = xw.App(visible=False)  # No mostrar la ventana de Excel
-wb = app.books.open(archivo_excel)
-ws = wb.sheets[0]  # Asumiendo que los datos están en la primera hoja
+# Cargar el archivo de Excel
+archivo_excel = r"C:\Users\Windows\Desktop\PYTHON\COMPARAR_PRECIOS.xlsx"
+wb = openpyxl.load_workbook(archivo_excel)
+ws = wb.active
 
 # Iterar sobre las filas para obtener URLs
-for fila in range(2, ws.cells.last_cell.row + 1):  # Comienza en la fila 2 para omitir encabezados
-    url = ws.cells(fila, 13).value  # Columna M (13) para las URLs
-    if url:
+for fila in ws.iter_rows(min_row=3, max_row=ws.max_row, min_col=13, max_col=13):  # Columna M = URL
+    celda_url = fila[0]
+    if celda_url.value:
+        url = celda_url.value
         try:
             # Hacer la solicitud a la URL
             response = requests.get(url)
@@ -20,18 +20,25 @@ for fila in range(2, ws.cells.last_cell.row + 1):  # Comienza en la fila 2 para 
 
             # Extraer el precio del span con la clase "price"
             span_precio = soup.find("span", class_="price")  # Ajusta la clase según la página
-            precio = span_precio.text.strip() if span_precio else "No encontrado"
+            if span_precio:
+                # Quitar símbolos y ajustar formato de número
+                precio_texto = (
+                    span_precio.text.strip()
+                    .replace("$", "")     # Eliminar símbolo de dólar
+                    .replace(".", "")    # Eliminar separadores de miles
+                    .replace(",", ".")   # Convertir separador decimal a punto
+                )
+                precio_numerico = float(precio_texto)  # Convertir a número
+            else:
+                precio_numerico = None  # Marcar como vacío si no se encuentra el precio
 
-            # Guardar el precio en la columna L (12)
-            ws.cells(fila, 12).value = precio
+            # Guardar el precio en la columna de PRECIO (Columna L)
+            ws.cell(row=celda_url.row, column=12, value=precio_numerico)  # Columna L = PRECIO
 
         except Exception as e:
             print(f"Error al procesar {url}: {e}")
-            ws.cells(fila, 12).value = "Error"  # Escribe 'Error' en caso de fallo
+            ws.cell(row=celda_url.row, column=12, value="Error")  # Escribe 'Error' en caso de fallo
 
 # Guardar los cambios en el archivo Excel
-wb.save()
-wb.close()
-app.quit()  # Cerrar la aplicación de Excel
-
+wb.save(r"C:\Users\Windows\Desktop\PYTHON\COMPARAR_PRECIOS.xlsx")
 print("Actualización completada. Archivo guardado.")

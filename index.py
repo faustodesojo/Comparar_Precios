@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import openpyxl
 
 # Cargar el archivo de Excel
-archivo_excel = r"C:\Users\Windows\Desktop\PYTHON\COMPARAR_PRECIOS.xlsm"  # Asegúrate de usar el prefijo 'r' o dobles barras '\\' para rutas en Windows
+archivo_excel = r"C:\Users\Windows\Desktop\PYTHON\COMPARAR_PRECIOS.xlsx"  # Asegúrate de usar el prefijo 'r' o dobles barras '\\' para rutas en Windows
 wb = openpyxl.load_workbook(archivo_excel)
 ws = wb.active
 
@@ -30,5 +30,5 @@ for fila in ws.iter_rows(min_row=3, max_row=ws.max_row, min_col=13, max_col=13):
             ws.cell(row=celda_url.row, column=12, value="Error")  # Escribe 'Error' en caso de fallo
 
 # Guardar los cambios en el archivo Excel
-wb.save(r"C:\Users\Windows\Desktop\PYTHON\COMPARAR_PRECIOS.xlsm" )
+wb.save(r"C:\Users\Windows\Desktop\PYTHON\COMPARAR_PRECIOS.xlsx" )
 print("Actualización completada. Archivo guardado como 'archivo_actualizado.xlsx'.")
