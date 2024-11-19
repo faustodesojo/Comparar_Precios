@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 import openpyxl
 
 # Cargar el archivo de Excel
-archivo_excel = r"C:\Users\Windows\Desktop\PYTHON\COMPARAR_PRECIOS.xlsx"
+archivo_excel = r"C:\Users\Windows\Desktop\PYTHON\COMPARAR_PRECIOS.xlsm"
 wb = openpyxl.load_workbook(archivo_excel)
 ws = wb.active
 
